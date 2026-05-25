@@ -1,0 +1,49 @@
+services:
+  # 1. Laravel Backend Service (Docker-based)
+  - type: web
+    name: hiresmart-api
+    runtime: docker
+    dockerfilePath: Dockerfile
+    dockerContext: laravel
+    plan: free
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        sync: false # Render will prompt you to enter the APP_KEY. Generate one using: php artisan key:generate --show
+      - key: PORT
+        value: "8080" # The default port for serversideup docker image
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_URL
+        fromDatabase:
+          name: hiresmart-db
+          property: connectionString
+      - key: DATABASE_URL
+        fromDatabase:
+          name: hiresmart-db
+          property: connectionString
+      # Third-Party Integration Keys (Render will prompt you to input these)
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: JOOBLE_API_KEY
+        sync: false
+      - key: GEOAPIFY_API_KEY
+        sync: false
+      - key: MAILBOXLAYER_API_KEY
+        sync: false
+      - key: BREVO_API_KEY
+        sync: false
+
+  # 2. Frontend Static Site Service
+  - type: web
+    name: hiresmart-frontend
+    runtime: static
+    publishPath: frontend
+
+databases:
+  # 3. PostgreSQL Database Service
+  - name: hiresmart-db
+    plan: free
